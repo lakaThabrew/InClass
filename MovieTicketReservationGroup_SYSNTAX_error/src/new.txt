@@ -1,0 +1,283 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.io.PrintWriter;
+import java.io.FileWriter;
+
+
+class InvalidMovieCodeException extends Exception {
+    public InvalidMovieCodeException(String message) {
+        super(message);
+    }
+}
+
+class InvalidDateException extends Exception {
+    public InvalidDateException(String message) {
+        super(message);
+    }
+}
+
+class InvalidShowtimeException extends Exception {
+    public InvalidShowtimeException(String message) {
+        super(message);
+    }
+}
+
+class InsufficientSeatsException extends Exception {
+    public InsufficientSeatsException(String message) {
+        super(message);
+    }
+}
+class Movie {
+    String movieCode;
+    String movieName;
+    String date;
+    String showtime;
+    int totalSeats;
+    int availableSeats;
+    double ticketPrice;
+    String language;
+    String genre;
+
+    public Movie(String movieCode, String movieName, String date, String showtime,
+                 int totalSeats, int availableSeats, double ticketPrice, String language, String genre) {
+        this.movieCode = movieCode;
+        this.movieName = movieName;
+        this.date = date;
+        this.showtime = showtime;
+        this.totalSeats = totalSeats;
+        this.availableSeats = availableSeats;
+        this.ticketPrice = ticketPrice;
+        this.language = language;
+        this.genre = genre;
+    }
+
+    public boolean isAvailable(int requestedSeats) {
+        return requestedSeats <= availableSeats;
+    }
+
+    public void bookTickets(int requestedSeats) throws InsufficientSeatsException {
+        if (isAvailable(requestedSeats)) {
+            availableSeats -= requestedSeats;
+        } else {
+            throw new InsufficientSeatsException("Not enough seats available.");
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Movie movie = (Movie) obj;
+        return Objects.equals(movieCode, movie.movieCode) &&
+               Objects.equals(date, movie.date) &&
+               Objects.equals(showtime, movie.showtime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(movieCode, date, showtime);
+    }
+
+    @Override
+    public String toString() {
+        return movieCode + " - " + movieName + " (" + date + " at " + showtime + ")";
+    }
+}
+
+public class MovieTicketReservationGroup_SYSNTAX_error{
+    private List<Movie> movies = new ArrayList<>();
+
+    public void loadMoviesFromCSV(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            br.readLine(); // Skip the header row
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length < 9) continue;
+
+                Movie movie = new Movie(
+                    data[0], data[1], data[2], data[3],
+                    Integer.parseInt(data[4]), Integer.parseInt(data[5]),
+                    Double.parseDouble(data[6]), data[7], data[8]
+                );
+                movies.add(movie);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading CSV file: " + e.getMessage());
+        }
+    }
+
+    public Set<String> getAvailableMovies() {
+        Set<String> movies1 = new HashSet<>();
+        for (Movie movie : movies) {
+            movies1.add(movie.movieCode +"-" + movie.movieName);
+        }
+        return movies1;
+    }
+    
+	public Set<String> getAvailableMovieCodes() throws InvalidMovieCodeException {
+			Set<String> movieCodes=new HashSet<>();
+			for(Movie movie: movies){
+				movieCodes.add(movie.movieCode);
+			}
+			return movieCodes;
+	}
+	
+    public Set<String> getAvailableShowtimes(String movieCode, String date) throws InvalidDateException {
+        Set<String> availableShowtimes = new HashSet<>();
+        for (Movie movie : movies) {
+            if (movie.movieCode.equalsIgnoreCase(movieCode) && movie.date.equals(date)) {
+                availableShowtimes.add(movie.showtime);
+            }
+        }
+        if (availableShowtimes.isEmpty()) {
+            throw new InvalidDateException("No shows available on this date.");
+        }
+        return availableShowtimes;
+    }
+
+    public Set<String> getAvailableDates(String movieCode) throws InvalidMovieCodeException {
+        Set<String> availableDates = new HashSet<>();
+        for (Movie movie : movies) {
+            if (movie.movieCode.equalsIgnoreCase(movieCode)) {
+                availableDates.add(movie.date);
+            }
+        }
+        if (availableDates.isEmpty()) {
+            throw new InvalidMovieCodeException("Movie code not found.");
+        }
+        return availableDates;
+    }
+
+    public int getAvailableSeats(String movieCode, String date, String showtime) {
+        for (Movie movie : movies) {
+            if (movie.movieCode.equalsIgnoreCase(movieCode) &&
+                movie.date.equals(date) &&
+                movie.showtime.equalsIgnoreCase(showtime)) {
+                return movie.availableSeats;
+            }
+        }
+        return -1; // Return -1 if no matching movie found
+    }
+
+    public double bookTickets(String movieCode, String date, String showtime, int requestedSeats) throws InsufficientSeatsException {
+        for (Movie movie : movies) {
+            if (movie.movieCode.equalsIgnoreCase(movieCode) &&
+                movie.date.equals(date) &&
+                movie.showtime.equalsIgnoreCase(showtime)) {
+
+                if (movie.isAvailable(requestedSeats)) {
+                    movie.bookTickets(requestedSeats);
+                    return movie.ticketPrice * requestedSeats;
+                } else {
+                    throw new InsufficientSeatsException("Not enough seats available.");
+                }
+            }
+        }
+        return -1; // Movie not found
+    }
+
+    public static void main(String[] args) {
+        MovieReservationSystem system = new MovieReservationSystem();
+        system.loadMoviesFromCSV("Movie Reservation Dataset.csv");
+
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            
+            Set<String> availableMovies = system.getAvailableMovies();
+            System.out.println("Available Movies : ");
+            for (String name: availableMovies ){
+				System.out.println(name);
+			} 
+			
+			Set<String> availableMovieCodes=system.getAvailableMovieCodes();
+  
+            String movieCode = null;
+            while (movieCode == null) {
+                System.out.print("Enter movie code: ");
+                String input = scanner.nextLine();
+                if (availableMovieCodes.contains(input)) {
+                    movieCode = input;
+                } else {
+                    System.out.println("Invalid Movie Code. Please choose from available codes.");
+                }
+            }
+
+            // Get valid date
+            Set<String> availableDates = system.getAvailableDates(movieCode);
+            System.out.println("Available Dates: " + availableDates);
+
+            String date = null;
+            while (date == null) {
+                System.out.print("Enter Date (YYYY-MM-DD): ");
+                String input = scanner.nextLine();
+                if (availableDates.contains(input)) {
+                    date = input;
+                } else {
+                    System.out.println("Invalid Date. Please choose from available dates.");
+                }
+            }
+
+            // Get valid showtime
+            Set<String> availableShowtimes = system.getAvailableShowtimes(movieCode, date);
+            System.out.println("Available Showtimes: " + availableShowtimes);
+
+            String showtime = null;
+            while (showtime == null) {
+                System.out.print("Enter Showtime (Morning, Afternoon, Evening): ");
+                String input = scanner.nextLine();
+                if (availableShowtimes.contains(input)) {
+                    showtime = input;
+                } else {
+                    System.out.println("Invalid Showtime. Please choose from available showtimes.");
+                }
+            }
+
+            // Get valid number of seats
+            int availableSeats = system.getAvailableSeats(movieCode, date, showtime);
+            System.out.println("Available Seats: " + availableSeats);
+
+            int requestedSeats = 0;
+            
+            while (requestedSeats <= 0 || requestedSeats > availableSeats) {
+                System.out.print("Enter number of seats: ");
+                requestedSeats = scanner.nextInt();
+                if(requestedSeats<0){
+					System.out.println("Please Enter Valid number.");
+				}
+                if (requestedSeats > availableSeats) {
+                    System.out.println("Not enough seats available. Please choose a smaller number.");
+                }
+            }
+
+            // Book tickets and show total price
+            double totalPrice = system.bookTickets(movieCode, date, showtime, requestedSeats);
+            System.out.println("Booking successful! " + requestedSeats + " tickets booked for " + movieCode +
+                    " on " + date + " at " + showtime + ". Total Price: Rs" + totalPrice +"/=");
+            System.out.print("Enter your name : ");
+            String customer_name = scanner.nextLine();
+            System.out.print("Enter your email :");
+            String email = scanner.nextLine();
+			String filename = customer_name + ".pdf";
+			try (PrintWriter writer = new PrintWriter(new FileWriter(filename, true))) {
+				writer.println(String.format("Name: %s", customer_name));
+				writer.println(String.format("Email: %s", email));
+				writer.println(String.format("Movie Code: %s", movieCode));
+				writer.println(String.format("Date: %s", date));
+				writer.println(String.format("Time: %s", showtime));
+				writer.println(String.format("Tickets: %d", requestedSeats));
+				writer.println(String.format("Price: %.2f", totalPrice ));
+			}catch(IOException e){
+				System.out.println("Invalid file.");
+				
+			}
+			//System.out.println("Your bill is Sent to your email " + email);
+        } catch (InvalidMovieCodeException | InvalidDateException |InsufficientSeatsException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
