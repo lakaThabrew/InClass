@@ -1,7 +1,11 @@
 {
-    "java.project.sourcePaths": ["src"],
+    "java.project.sourcePaths": [
+        "src"
+    ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "lib\\commons-logging-1.3.5.jar",
+        "f:\\acadamic\\Semester 02\\Programme Contruction\\InClassLab - Online movie ticket reservation system\\MovieTicketReservationGroup_SYSNTAX_error\\lib\\pdfbox-app-3.0.4.jar",
+        "f:\\acadamic\\Semester 02\\Programme Contruction\\InClassLab - Online movie ticket reservation system\\MovieTicketReservationGroup_SYSNTAX_error\\lib\\fontbox-3.0.4.jar"
     ]
 }

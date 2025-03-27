@@ -20,13 +20,32 @@ Non-Functional Requirements
 5. Reliability: The system must be reliable, if there are no errors then it works correctly. When generate any exception, should handle without crashing the system. for a example, If an email fails to send, the user should be notified and allowed to re-enter their email.
 6. Maintainability: The code should be modula and easy to maintain the system. Support to add different movie details. The code has to be OOP compliant to improve readabality and reusability.
 7. Portability: The below system should be able to run in different interfaces(Windows, MacOS, Linux) without significant change in the code. */
+import java.util.Scanner;
 
 public class MovieTicketReservationGroup_SYSNTAX_error {
     public static void main(String[] args) throws IOException, InvalidMovieCodeException, InvalidDateTimeException, InvalidTicketQuantityException, OverbookingException {
         BookingSystem system = new BookingSystem();
-        system.loadMovies("Movie Reservation Dataset.CSV");
+        system.loadMovies("F:\\acadamic\\Semester 02\\Programme Contruction\\InClassLab - Online movie ticket reservation system\\MovieTicketReservationGroup_SYSNTAX_error\\src\\Movie Reservation Dataset.csv");
+        boolean flag = true;
+        Scanner scanner = new Scanner(System.in);
+        while (flag) 
+        {
+            ScreenTimeOut timeout = new ScreenTimeOut(10);
+            Thread thread = new Thread(timeout);
+            thread.start();
 
-        system.makebooking();
-        
+            system.makebooking(scanner);
+                
+            System.out.println("Do you want to continue? (Y/N)");
+            String ch = scanner.nextLine().trim().toUpperCase();
+            if ("N".equals(ch))
+            {
+                flag = false;
+            }
+            timeout.stop();
+
+        }
+        scanner.close();
     }
+
 }
