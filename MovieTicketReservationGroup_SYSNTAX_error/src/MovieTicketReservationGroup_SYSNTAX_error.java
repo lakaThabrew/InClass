@@ -43,7 +43,6 @@ public class MovieTicketReservationGroup_SYSNTAX_error {
                 flag = false;
             }
             timeout.stop();
-
         }
         scanner.close();
     }
