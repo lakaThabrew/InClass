@@ -1,0 +1,10 @@
+{
+    "java.project.sourcePaths": [
+        "MovieTicketReservationGroup_SYSNTAX_error\\src"
+    ],
+    "java.project.referencedLibraries": [
+        "MovieTicketReservationGroup_SYSNTAX_error\\lib\\commons-logging-1.3.5.jar",
+        "MovieTicketReservationGroup_SYSNTAX_error\\lib\\fontbox-3.0.4.jar",
+        "MovieTicketReservationGroup_SYSNTAX_error\\lib\\pdfbox-app-3.0.4.jar"
+    ]
+}

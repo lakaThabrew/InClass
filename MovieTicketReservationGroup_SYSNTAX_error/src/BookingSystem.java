@@ -109,7 +109,6 @@ public class BookingSystem {
     }
 
     public void printPdf(String customer_name, String email, String movie_code, String date, String time, int tickets, double price) throws IOException {
-
         PDDocument document = new PDDocument();
         PDPage page = new PDPage();
         document.addPage(page);
