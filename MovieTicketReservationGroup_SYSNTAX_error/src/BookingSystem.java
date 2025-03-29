@@ -108,47 +108,51 @@ public class BookingSystem {
         return 0;
     }
 
-    public void printPdf(String customer_name, String email, String movie_code, String date, String time, int tickets, double price) throws IOException {
-        PDDocument document = new PDDocument();
-        PDPage page = new PDPage();
-        document.addPage(page);
+    public void printPdf(String customer_name, String email, String movie_code, String date, String time, int tickets, double price) throws IOException 
+    {
+        try(PDDocument document = new PDDocument())
+        {
+            PDPage page = new PDPage();
+            document.addPage(page);
 
-        // Start content stream
-        PDPageContentStream contentStream = new PDPageContentStream(document, page);
-        contentStream.beginText();
-        PDTrueTypeFont customFont = PDTrueTypeFont.load(document, new File("F:\\acadamic\\Semester 02\\Programme Contruction\\InClassLab - Online movie ticket reservation system\\MovieTicketReservationGroup_SYSNTAX_error\\src\\Arial.ttf"), WinAnsiEncoding.INSTANCE);
-        contentStream.setFont(customFont, 14);
-        contentStream.newLineAtOffset(100, 700); // Set text position
+            // Start content stream
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.beginText();
+            PDTrueTypeFont customFont = PDTrueTypeFont.load(document, new File("F:\\acadamic\\Semester 02\\Programme Contruction\\InClassLab - Online movie ticket reservation system\\MovieTicketReservationGroup_SYSNTAX_error\\src\\Arial.ttf"), WinAnsiEncoding.INSTANCE);
+            contentStream.setFont(customFont, 14);
+            contentStream.newLineAtOffset(100, 700); // Set text position
 
-        // Write text into the PDF
-        contentStream.showText("Movie Ticket Reservation System");
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("==================================");
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("Name: " + customer_name);
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("Email: " + email);
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("Movie Code: " + movie_code);
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("Date: " + date);
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("Time: " + time);
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText("Tickets: " + tickets);
-        contentStream.newLineAtOffset(0, -20);
-        contentStream.showText(String.format("Price: Rs. %.2f", price));
-
-        // End text stream
-        contentStream.endText();
-        contentStream.close();
-
-
-        String filename = customer_name + ".pdf";
-        document.save(filename);
-        document.close();
-        System.out.println("Your bill has been saved as " + filename + " and sent to " + email);
-}
+            // Write text into the PDF
+            contentStream.showText("Movie Ticket Reservation System");
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("==================================");
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Name: " + customer_name);
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Email: " + email);
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Movie Code: " + movie_code);
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Date: " + date);
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Time: " + time);
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Tickets: " + tickets);
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText(String.format("Price: Rs. %.2f", price));
+            contentStream.endText();
+            contentStream.close();
+            String filename = customer_name + ".pdf";
+            document.save(filename);
+            document.close();
+            System.out.println("Your bill has been saved as " + filename + " and sent to " + email);
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("Error creating PDF: " + e.getMessage());
+        }
+    }
+       
 
     private boolean isValidMovieCode(String movie_code) {
         for (Movie movie : movies) {
